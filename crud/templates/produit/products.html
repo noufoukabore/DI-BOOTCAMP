@@ -1,0 +1,150 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Products{% endblock %} {% block main_content %}
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        {% include 'partials/sidebar.html' %}
+    </ul>
+    <!-- End of Sidebar -->
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                {% include 'partials/navbar.html' %}
+            </nav>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- Page Heading -->
+                <div class="modal fade" id="addadminprofile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                            </div>
+                            <div class="modal_body"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid">
+                    {% include "partials/_alert.html" %}
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Listes des Produits
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addadminprofile" id="add_product">
+                                Ajouter
+                              </button>
+                            </h6>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Description</th>
+                                            <th>Prix</th>
+                                            <th>Mots-cles</th>
+                                            <th>Modifier</th>
+                                            <th>Supprimer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for products in product %}
+                                        <tr>
+                                            <td> {{products.name}} </td>
+                                            <td> {{products.description}} </td>
+                                            <td> {{products.price}} </td>
+                                            <td> {{products.mots_cles}} </td>
+                                            <td>
+                                                <button type="button" name="edit_btn" data-id="{{products.id}}" data-toggle="modal" data-target="#addadminprofile" class="btn btn-success edit_product">Modifier</button>
+                                            </td>
+                                            <td>
+                                                <button type="submit" data-id="{{products.id}}" class="btn btn-danger delete_product" data-toggle="modal" data-target="#confirmDeleteModal" >Supprimer</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <!-- Modal de confirmation Bootstrap -->
+                                {% include 'partials/_confirm_delete_modal.html' %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            {% include 'partials/footer.html' %}
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    <!-- End of Content Wrapper -->
+    <!-- End of Page Wrapper -->
+</div>{% endblock %}
+{% block js %}
+{% with includePath="partials/logout_modals.html" %}
+<script>
+    $(function() {
+        $('#add_product').click(function() {
+            modalShow('Ajouter un nouveau produit', "{% url 'manage_product' %}", 'url');
+        });
+        $('.edit_product').click(function() {
+            modalShow('Modifier ce produit', "{% url 'manage_product' %}?id="+$(this).attr('data-id'), 'url' );
+        });
+        $('.delete_product').click(function() {
+            var productId = $(this).data('id');
+
+            $('#confirmDeleteModal').data('product-id', productId);
+            $('#confirmDeleteModal').modal('show');
+
+            $('#confirmDeleteBtn').click(function() {
+                var productId = $('#confirmDeleteModal').data('product-id');
+
+                $.ajax({
+                headers: {
+                    'X-CSRFToken': "{{csrf_token}}"
+                },
+                url: "{% url 'delete_product' 0 %}".replace(0, productId),
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.status == 'success') {
+                        console.log('Produit supprime avec succes');
+                    } else {
+                        console.log('Echec de la suppression du produit');
+                    }
+                }
+            });
+             $('#confirmDeleteModal').modal('hide');
+            });
+
+        });
+
+        document.getElementById('confirmLogout').addEventListener('click', function() {
+        // Effectuez une requête AJAX pour déconnecter l'utilisateur
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Redirigez l'utilisateur vers la page de connexion après la déconnexion
+                window.location.href = '/account/login/';
+            }
+        };
+        xhr.open('GET', 'account/logout/');  // Assurez-vous que le chemin correspond à votre URL de déconnexion
+        xhr.send();
+    });
+           
+        });
+    
+</script>
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}FAQ{% endblock %} 
+{% block main_content %}
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        {% include 'partials/sidebar.html' %}
+    </ul>
+    <!-- End of Sidebar -->
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                {% include 'partials/navbar.html' %}
+            </nav>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- Page Heading -->
+                <div class="modal fade" id="addadminprofile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                            </div>
+                            <div class="modal_body"></div>
+                        </div>
+                    </div>
+                </div>
+          
+                  <div class="container-fluid">
+                  {% include "partials/_alert.html" %}
+                    <!-- Card for FAQ List -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Liste des FAQ
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addadminprofile" id="add_faq">
+                                    Ajouter
+                                </button>
+                            </h6>
+                        </div>
+                
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Question</th>
+                                            <th>Réponse</th>
+                                            <th>Mots-Cles</th>
+                                            <th>Modifier</th>
+                                            <th>Supprimer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for faq in faqs %}
+                                        <tr>
+                                            <td> {{faq.question}} </td>
+                                            <td> {{faq.reponse}} </td>
+                                            <td> {{faq.mots_cles}} </td>
+                                            <td>
+                                                <button type="button" name="edit_btn" data-id="{{faq.id}}" data-toggle="modal" data-target="#addadminprofile" class="btn btn-success edit_faq">Modifier</button>
+                                            </td>
+                                            <td>
+                                                <button type="submit" data-id="{{faq.id}}" class="btn btn-danger delete_faq" data-toggle="modal" data-target="#confirmDeleteModal" >Supprimer</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <!-- Modal de confirmation Bootstrap -->
+                                {% include 'partials/_confirm_delete_modal.html' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            {% include 'partials/footer.html' %}
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    <!-- End of Content Wrapper -->
+    <!-- End of Page Wrapper -->
+</div>
+
+{% endblock %}
+{% block js %}
+<script>
+    $(function() {
+        $('#add_faq').click(function() {
+            modalShow('Ajouter une FAQ', "{% url 'manage_faq' %}", 'url');
+        });
+        $('.edit_faq').click(function() {
+            modalShow('Modifier ce FAQ', "{% url 'manage_faq' %}?id="+$(this).attr('data-id'), 'url' );
+        });
+        $('.delete_faq').click(function() {
+            var faqId = $(this).data('id');
+
+            $('#confirmDeleteModal').data('faq-id', faqId);
+            $('#confirmDeleteModal').modal('show');
+
+            $('#confirmDeleteBtn').click(function() {
+                var faqId = $('#confirmDeleteModal').data('faq-id');
+
+                $.ajax({
+                headers: {
+                    'X-CSRFToken': "{{csrf_token}}"
+                },
+                url: "{% url 'delete_faq' 0 %}".replace(0, faqId),
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.status == 'success') {
+                        console.log('FAQ supprime avec succes');
+                    } else {
+                        console.log('Echec de la suppression du FAQ');
+                    }
+                }
+            });
+                $('#confirmDeleteModal').modal('hide');
+            });      
+        });
+    });
+
+    
+</script>
+{% endblock %}

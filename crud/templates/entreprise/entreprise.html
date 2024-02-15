@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Entreprise{% endblock %}
+
+{% block main_content %}
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        {% include 'partials/sidebar.html' %}
+    </ul>
+    <!-- End of Sidebar -->
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                {% include 'partials/navbar.html' %}
+            </nav>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <tbody>
+                                            {% for entreprise in entreprises %}
+                                            <tr>
+                                                <td><strong>Nom de l'entreprise</strong></td>
+                                                <td> {{entreprise.name}} </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Description de l'entreprise</strong></td>
+                                                <td> {{entreprise.description}} </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Email de l'entreprise</strong></td>
+                                                <td> {{entreprise.email}} </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Telephone</strong></td>
+                                                <td> {{entreprise.phone}} </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Vision</strong></td>
+                                                <td> {{entreprise.vision}} </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Domaine</strong></td>
+                                                <td> {{entreprise.domaine}} </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <img src="{% static 'img/smt.logo.png' %}" alt="Logo de l'entreprise" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+            
+                
+            </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            {% include 'partials/footer.html' %}
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    <!-- End of Content Wrapper -->
+    <!-- End of Page Wrapper -->
+</div>
+
+{% endblock %}

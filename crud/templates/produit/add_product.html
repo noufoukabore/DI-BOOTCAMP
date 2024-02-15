@@ -1,0 +1,70 @@
+<form method="POST" enctype="multipart/form-data" id='save-form'>
+    <input type="hidden" name="id" value="{{product.id}}">
+    <div class="modal-body">
+        <div class="form-group">
+            <label>Nom</label>
+            <input type="text" name="name" value="{{product.name}}" class="form-control" placeholder="Nom du produit">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" name="description" value="{{product.description}}" class="form-control" placeholder="Description du produit">
+        </div>
+        <div class="form-group">
+            <label>Prix</label>
+            <input type="Number" name="price" value="{{product.price}}" class="form-control" placeholder="Prix du produit">
+        </div>
+        <div class="form-group">
+            <label>Mots-cles</label>
+            <input type="text" name="mots_cles" value="{{product.mots_cles}}" class="form-control" placeholder="Mots-cles du produit (ex: pointeur, porte)">
+        </div>
+        <div class="form-group">
+            <label>Image</label>
+            <input type="file" name="image" value="{{product.image}}" class="form-control" placeholder="Choisir une image">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="submit" name="registerbtn" class="btn btn-primary">Enregistrer</button>
+    </div>
+</form>
+
+<script>
+    $(function(){
+        $('#save-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this);
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            $.ajax({
+                headers: {
+                    'X-CSRFToken': "{{csrf_token}}"
+                },
+                url: '{% url "save_product" %}',
+                data : new FormData($(this)[0]),
+                cache : false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type:'POST',
+                dataType: 'json',
+                error: err=>{
+                    console.log(err);
+                    alert_toast('Erreur');
+                },
+                success: function(resp){
+                    if (typeof resp == 'object' && resp.status == 'success'){
+                        location.reload()
+                    } else if(resp.status == 'failed' && !!resp.msg){
+                        alert_toast(resp.msg);
+                    } else{
+                        alert_toast('Erreur');
+                    }
+                }
+                });
+        });
+    });
+    
+</script>
